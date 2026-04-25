@@ -277,21 +277,14 @@ export const navBarConfig: NavBarConfig = {
 		LinkPreset.Archive,
 		// 支持自定义导航栏链接，支持多级菜单
 		{
-			name: "My",
-			url: "/content/",
-			icon: "material-symbols:person",
-			children: [
-				{
-					name: "Diary",
-					url: "/diary/",
-					icon: "material-symbols:book",
-				},
-				{
-					name: "Gallery",
-					url: "/albums/",
-					icon: "material-symbols:photo-library",
-				},
-			],
+			name: "Gallery",
+			url: "/albums/",
+			icon: "material-symbols:photo-library",
+		},
+		{
+			name: "Timeline",
+			url: "/timeline/",
+			icon: "material-symbols:timeline",
 		},
 		{
 			name: "About",
@@ -307,23 +300,6 @@ export const navBarConfig: NavBarConfig = {
 					name: "Friends",
 					url: "/friends/",
 					icon: "material-symbols:group",
-				},
-			],
-		},
-		{
-			name: "Others",
-			url: "#",
-			icon: "material-symbols:more-horiz",
-			children: [
-				{
-					name: "Projects",
-					url: "/projects/",
-					icon: "material-symbols:work",
-				},
-				{
-					name: "Timeline",
-					url: "/timeline/",
-					icon: "material-symbols:timeline",
 				},
 			],
 		},
@@ -348,6 +324,11 @@ export const profileConfig: ProfileConfig = {
 			name: "GitHub",
 			icon: "fa7-brands:github",
 			url: "https://github.com/Babytiann",
+		},
+		{
+			name: "Email",
+			icon: "fa7-solid:envelope", // 替换为你项目里支持的邮箱图标名
+			url: "mailto:meow@gemdzqq.com", // 关键点：链接前面要加 mailto:
 		},
 	],
 };
