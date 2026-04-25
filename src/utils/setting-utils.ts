@@ -2,7 +2,9 @@ import {
 	DARK_MODE,
 	DEFAULT_THEME,
 	LIGHT_MODE,
-	// WALLPAPER_BANNER,
+	WALLPAPER_BANNER,
+	WALLPAPER_FULLSCREEN,
+	WALLPAPER_NONE,
 } from "@constants/constants";
 
 import { siteConfig } from "@/config";
@@ -153,16 +155,28 @@ export function getStoredTheme(): LIGHT_DARK_MODE {
 }
 
 export function getStoredWallpaperMode(): WALLPAPER_MODE {
-	return (
-		(localStorage.getItem("wallpaperMode") as WALLPAPER_MODE) ||
-		siteConfig.wallpaperMode.defaultMode
-	);
+	const storedMode = localStorage.getItem("wallpaperMode");
+	const configuredMode = siteConfig.wallpaperMode.defaultMode;
+	const nextMode =
+		storedMode === WALLPAPER_FULLSCREEN || storedMode === WALLPAPER_NONE
+			? storedMode
+			: configuredMode === WALLPAPER_NONE
+				? WALLPAPER_NONE
+				: WALLPAPER_FULLSCREEN;
+
+	if (storedMode === WALLPAPER_BANNER || storedMode !== nextMode) {
+		localStorage.setItem("wallpaperMode", nextMode);
+	}
+
+	return nextMode;
 }
 
 export function setWallpaperMode(mode: WALLPAPER_MODE): void {
-	localStorage.setItem("wallpaperMode", mode);
+	const nextMode = mode === WALLPAPER_BANNER ? WALLPAPER_FULLSCREEN : mode;
+
+	localStorage.setItem("wallpaperMode", nextMode);
 	// 触发自定义事件通知其他组件壁纸模式已改变
 	window.dispatchEvent(
-		new CustomEvent("wallpaper-mode-change", { detail: { mode } }),
+		new CustomEvent("wallpaper-mode-change", { detail: { mode: nextMode } }),
 	);
 }

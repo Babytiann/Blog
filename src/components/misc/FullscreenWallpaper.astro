@@ -95,7 +95,11 @@ const renderGroups = [
 	<script is:inline>
 	// 立即执行脚本：防止闪烁
 	(function() {
-		const mode = localStorage.getItem('wallpaperMode') || 'banner';
+		const storedMode = localStorage.getItem('wallpaperMode');
+		const mode = storedMode === 'none' ? 'none' : 'fullscreen';
+		if (storedMode === 'banner' || storedMode !== mode) {
+			localStorage.setItem('wallpaperMode', mode);
+		}
 		if (mode !== 'fullscreen') {
 			document.currentScript.parentElement.style.display = 'none';
 		}
