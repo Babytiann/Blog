@@ -1,6 +1,5 @@
 <script lang="ts">
 	import {
-		WALLPAPER_BANNER,
 		WALLPAPER_FULLSCREEN,
 		WALLPAPER_NONE,
 	} from "@constants/constants";
@@ -22,11 +21,6 @@
 		label: I18nKey;
 	}[] = [
 		{
-			mode: WALLPAPER_BANNER,
-			icon: "material-symbols:image-outline",
-			label: I18nKey.wallpaperBanner,
-		},
-		{
 			mode: WALLPAPER_FULLSCREEN,
 			icon: "material-symbols:wallpaper",
 			label: I18nKey.wallpaperFullscreen,
@@ -38,7 +32,7 @@
 		},
 	];
 
-	let mode: WALLPAPER_MODE = $state(WALLPAPER_BANNER);
+	let mode: WALLPAPER_MODE = $state(WALLPAPER_FULLSCREEN);
 
 	onMount(() => {
 		mode = getStoredWallpaperMode();

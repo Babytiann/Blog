@@ -14,7 +14,7 @@ interface Props {
 
 const {
 	navbarTransparentMode = "semi",
-	defaultWallpaperMode = "banner",
+	defaultWallpaperMode = "fullscreen",
 	defaultPostListLayout = "list",
 	BANNER_HEIGHT = 35,
 	pageScaling = { enable: false },
@@ -32,10 +32,24 @@ const {
 		pageScaling,
 	}}
 >
+	function getNormalizedWallpaperMode() {
+		const storedMode = localStorage.getItem("wallpaperMode");
+		const nextMode =
+			storedMode === "fullscreen" || storedMode === "none"
+				? storedMode
+				: defaultWallpaperMode === "none"
+					? "none"
+					: "fullscreen";
+
+		if (storedMode === "banner" || storedMode !== nextMode) {
+			localStorage.setItem("wallpaperMode", nextMode);
+		}
+
+		return nextMode;
+	}
 	// 立即执行，在页面渲染前应用壁纸模式和布局模式，避免闪烁
 	(function () {
-		const wallpaperMode =
-			localStorage.getItem("wallpaperMode") || defaultWallpaperMode;
+		const wallpaperMode = getNormalizedWallpaperMode();
 		const body = document.body;
 
 		// 立即应用 body 类，确保首次渲染就是正确的状态
@@ -128,8 +142,7 @@ const {
 
 	// 根据壁纸模式动态设置 banner 和全屏壁纸的显示
 	function applyWallpaperMode() {
-		const wallpaperMode =
-			localStorage.getItem("wallpaperMode") || defaultWallpaperMode;
+		const wallpaperMode = getNormalizedWallpaperMode();
 		const bannerWrapper = document.getElementById("banner-wrapper");
 		const fullscreenWallpaper = document.querySelector(
 			"[data-fullscreen-wallpaper]",
