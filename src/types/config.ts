@@ -189,6 +189,10 @@ export interface SiteConfig {
 		useJapaneseBadge?: boolean; // 使用日语假名标记（あいうえお...）代替数字
 	};
 	showCoverInContent: boolean; // 控制文章封面在文章内容页显示的开关
+	postCoverFallback?: {
+		enable: boolean; // 是否为没有 image 的文章使用默认封面
+		url: string; // 直出图片 API 地址
+	};
 	generateOgImages: boolean;
 	favicon: Favicon[];
 	showLastModified: boolean; // 控制"上次编辑"卡片显示的开关

@@ -11,6 +11,7 @@ import Comment from "@components/comment/index.astro";
 import PasswordProtection from "@components/features/auth/PasswordProtection.astro";
 import {
 	LastModified,
+	PostCoverFallback,
 	PostMeta,
 	PostNavigation,
 } from "@components/features/posts";
@@ -25,6 +26,10 @@ import {
 	hasCustomPermalink,
 	initPostIdMap,
 } from "@utils/permalink-utils";
+import {
+	isPostCoverFallback,
+	resolvePostCover,
+} from "@utils/post-cover";
 import { getFileDirFromPath } from "@utils/url-utils";
 import type { CollectionEntry } from "astro:content";
 import { render } from "astro:content";
@@ -78,6 +83,9 @@ const { entry } = Astro.props;
 const { Content, headings } = await render(entry);
 
 const { remarkPluginFrontmatter } = await render(entry);
+const postCover = await resolvePostCover(entry.data.image, entry.id);
+const usesFallbackCover = isPostCoverFallback(postCover);
+const layoutBanner = usesFallbackCover ? undefined : postCover;
 
 // 处理加密逻辑
 let encryptedContent = "";
@@ -110,7 +118,7 @@ const jsonLd = {
 ---
 
 <MainGridLayout
-	banner={entry.data.image}
+	banner={layoutBanner}
 	title={entry.data.title}
 	description={entry.data.description}
 	lang={entry.data.lang}
@@ -201,26 +209,39 @@ const jsonLd = {
 					id={entry.id}
 				/>
 				{
-					(!entry.data.image ||
-						(entry.data.image &&
-							!siteConfig.showCoverInContent)) && (
+					(!postCover ||
+						(postCover && !siteConfig.showCoverInContent)) && (
 						<div class="mt-4 border-[var(--line-divider)] border-dashed border-b-[1px] mb-5" />
 					)
 				}
 			</div>
 
 			{
-				entry.data.image && siteConfig.showCoverInContent && (
+				postCover && siteConfig.showCoverInContent && (
 					<>
 						<div class="mt-4" />
-						<Image
-							id="post-cover"
-							src={entry.data.image}
-							basePath={getFileDirFromPath(entry.filePath || "")}
-							class="mb-8 rounded-xl banner-container onload-animation"
-							widths={[640, 1024, 1536, 2048]}
-							sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-						/>
+						{
+							usesFallbackCover ? (
+								<PostCoverFallback
+									id="post-cover"
+									postId={entry.id}
+									class="mb-8 rounded-xl banner-container onload-animation"
+									loading="eager"
+									fetchpriority="high"
+								/>
+							) : (
+								<Image
+									id="post-cover"
+									src={postCover}
+									basePath={getFileDirFromPath(
+										entry.filePath || "",
+									)}
+									class="mb-8 rounded-xl banner-container onload-animation"
+									widths={[640, 1024, 1536, 2048]}
+									sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+								/>
+							)
+						}
 					</>
 				)
 			}

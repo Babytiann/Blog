@@ -1,0 +1,119 @@
+---
+import { getPostCoverFallbackUrl } from "@/utils/post-cover";
+
+interface Props {
+	id?: string;
+	postId?: string;
+	class?: string;
+	alt?: string;
+	position?: string;
+	loading?: "eager" | "lazy";
+	fetchpriority?: "high" | "low" | "auto";
+}
+
+const {
+	id,
+	postId,
+	alt,
+	position = "center",
+	loading = "lazy",
+	fetchpriority,
+} = Astro.props;
+const className = Astro.props.class;
+const fallbackUrl = getPostCoverFallbackUrl();
+const imageStyle = `object-position: ${position}`;
+---
+
+<div id={id} class:list={[className, "overflow-hidden relative"]}>
+	<div
+		class="transition absolute inset-0 dark:bg-black/10 bg-opacity-50 pointer-events-none"
+	>
+	</div>
+	<img
+		data-post-cover-fallback
+		data-fallback-key={postId}
+		data-fallback-src={fallbackUrl}
+		alt={alt || ""}
+		class="w-full h-full object-cover opacity-0 transition-opacity duration-300"
+		style={imageStyle}
+		loading={loading}
+		fetchpriority={fetchpriority}
+	/>
+</div>
+
+<script is:inline>
+	(function () {
+		var fallbackCache =
+			(window.__mizukiPostCoverFallbackCache =
+				window.__mizukiPostCoverFallbackCache || {});
+
+		function showImage(img, src) {
+			img.addEventListener(
+				"load",
+				function () {
+					img.style.opacity = "1";
+					img.dataset.postCoverStatus = "loaded";
+				},
+				{ once: true },
+			);
+			img.src = src;
+		}
+
+		function loadFallbackImage(img) {
+			if (img.dataset.postCoverStatus) {
+				return;
+			}
+
+			var fallbackKey = img.dataset.fallbackKey;
+			if (fallbackKey && fallbackCache[fallbackKey]) {
+				showImage(img, fallbackCache[fallbackKey]);
+				return;
+			}
+
+			var fallbackSrc = img.dataset.fallbackSrc;
+			if (!fallbackSrc) {
+				return;
+			}
+
+			img.dataset.postCoverStatus = "loading";
+
+			fetch(fallbackSrc, { cache: "no-store" })
+				.then(function (response) {
+					if (!response.ok) {
+						throw new Error("Failed to fetch post cover fallback");
+					}
+					return response.blob();
+				})
+				.then(function (blob) {
+					var objectUrl = URL.createObjectURL(blob);
+					if (fallbackKey) {
+						fallbackCache[fallbackKey] = objectUrl;
+					}
+					showImage(img, objectUrl);
+				})
+				.catch(function () {
+					showImage(img, fallbackSrc);
+				});
+		}
+
+		function initPostCoverFallbacks() {
+			document
+				.querySelectorAll(
+					"img[data-post-cover-fallback]:not([data-post-cover-status])",
+				)
+				.forEach(loadFallbackImage);
+		}
+
+		initPostCoverFallbacks();
+
+		if (!window.__mizukiPostCoverFallbackBound) {
+			window.__mizukiPostCoverFallbackBound = true;
+			document.addEventListener("DOMContentLoaded", initPostCoverFallbacks);
+			document.addEventListener("astro:page-load", initPostCoverFallbacks);
+			document.addEventListener(
+				"swup:contentReplaced",
+				initPostCoverFallbacks,
+			);
+		}
+	})();
+</script>

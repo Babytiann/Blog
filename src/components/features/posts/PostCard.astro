@@ -2,12 +2,17 @@
 import { render } from "astro:content";
 import { Icon } from "astro-icon/components";
 
+import {
+	isPostCoverFallback,
+	resolvePostCover,
+} from "@/utils/post-cover";
 import { getFileDirFromPath, getPostUrl, getTagUrl } from "@/utils/url-utils";
 
 import { siteConfig } from "../../../config";
 import I18nKey from "../../../i18n/i18nKey";
 import { i18n } from "../../../i18n/translation";
 import Image from "../../atoms/Image/Image.astro";
+import PostCoverFallback from "./PostCoverFallback.astro";
 import PostMetadata from "./PostMeta.astro";
 import type { PostCardProps } from "./types";
 
@@ -28,7 +33,9 @@ const {
 } = entry.data;
 
 const url = getPostUrl(entry);
-const hasCover = image !== undefined && image !== null && image !== "";
+const postCover = await resolvePostCover(image, entry.id);
+const usesFallbackCover = isPostCoverFallback(postCover);
+const hasCover = postCover !== "";
 const coverWidth = "28%";
 
 const { remarkPluginFrontmatter } = await render(entry);
@@ -152,14 +159,24 @@ const { remarkPluginFrontmatter } = await render(entry);
 						class="transition opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 text-white text-5xl"
 					/>
 				</div>
-				<Image
-					src={image}
-					basePath={getFileDirFromPath(entry.filePath || "")}
-					alt="Cover Image of the Post"
-					class="w-full h-full"
-					widths={[200, 400, 800]}
-					sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-				/>
+				{
+					usesFallbackCover ? (
+						<PostCoverFallback
+							postId={entry.id}
+							alt="Cover Image of the Post"
+							class="w-full h-full"
+						/>
+					) : (
+						<Image
+							src={postCover}
+							basePath={getFileDirFromPath(entry.filePath || "")}
+							alt="Cover Image of the Post"
+							class="w-full h-full"
+							widths={[200, 400, 800]}
+							sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+						/>
+					)
+				}
 			</a>
 		)
 	}
