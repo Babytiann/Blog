@@ -13,7 +13,7 @@
 	let result: SearchResult[] = $state([]);
 	let pagefindLoaded = false;
 	let initialized = $state(false);
-	let isDesktopSearchExpanded = $state(false);
+	let isDesktopSearchExpanded = $state(true);
 	let debounceTimer: NodeJS.Timeout;
 	let windowJustFocused = false;
 	let focusTimer: NodeJS.Timeout;
@@ -70,14 +70,14 @@
 
 	const collapseDesktopSearch = () => {
 		if (!keywordDesktop) {
-			isDesktopSearchExpanded = false;
+			isDesktopSearchExpanded = true;
 		}
 	};
 
 	const handleBlur = () => {
 		// 延迟处理以允许搜索结果的点击事件先于折叠逻辑执行
 		blurTimer = setTimeout(() => {
-			isDesktopSearchExpanded = false;
+			isDesktopSearchExpanded = true;
 			// 仅隐藏面板并折叠，保留搜索关键词和结果以便下次展开时查看
 			setPanelVisibility(false, true);
 		}, 200);
@@ -218,11 +218,7 @@
 	$effect(() => {
 		if (typeof document !== "undefined") {
 			const navbar = document.getElementById("navbar");
-			if (isDesktopSearchExpanded) {
-				navbar?.classList.add("is-searching");
-			} else {
-				navbar?.classList.remove("is-searching");
-			}
+			navbar?.classList.remove("is-searching");
 		}
 	});
 
@@ -236,8 +232,8 @@
 	});
 </script>
 
-<!-- search bar for desktop view (collapsed by default) -->
-<div class="hidden lg:block relative w-11 h-11 shrink-0">
+<!-- search bar for desktop view -->
+<div class="hidden lg:block relative w-48 h-11 shrink-0">
 	<button
 		id="search-bar"
 		class="flex transition-all items-center h-11 rounded-lg absolute right-0 top-0 shrink-0 border-0 bg-transparent cursor-pointer

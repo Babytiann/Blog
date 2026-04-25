@@ -50,8 +50,8 @@ const logoWebpSrc = hasLogoPngFallback ? logoSrc.replace(/\.png$/i, ".webp") : l
 const iconWebpSrc = hasIconPngFallback ? iconSrc.replace(/\.png$/i, ".webp") : iconSrc;
 ---
 <div id="navbar" class="z-50 onload-animation group" data-transparent-mode={navbarTransparentMode} data-is-home={isHomePage}>
-    <div class:list={[className, "navbar-main-c !overflow-visible w-full max-w-none h-[4.5rem] mx-auto flex items-center justify-between px-4"]}>
-        <a href={url('/')} class="btn-plain scale-animation rounded-lg h-[2.5rem] md:h-[3.25rem] md:[.enable-banner_&]:h-[2.5rem] md:[.enable-banner_&]:group-[.scrolled]:h-[3.25rem] px-5 font-bold active:scale-95 shrink-0 transition-all duration-300">
+    <div class:list={[className, "navbar-main-c !overflow-visible w-full max-w-none h-[4.5rem] mx-auto grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 px-4"]}>
+        <a href={url('/')} class="btn-plain scale-animation rounded-lg h-[2.5rem] md:h-[3.25rem] md:[.enable-banner_&]:h-[2.5rem] md:[.enable-banner_&]:group-[.scrolled]:h-[3.25rem] px-5 font-bold active:scale-95 shrink-0 justify-self-start transition-all duration-300">
             <div class="flex flex-row items-center text-md">
 				{/* 使用navbarTitle配置或默认配置 */}
                 {siteConfig.navbarTitle ? (
@@ -85,12 +85,12 @@ const iconWebpSrc = hasIconPngFallback ? iconSrc.replace(/\.png$/i, ".webp") : i
                 )}
             </div>
         </a>
-        <div id="navbar-links-container" class="hidden md:flex items-center space-x-1 transition-opacity duration-300">
+        <div id="navbar-links-container" class="hidden md:flex items-center space-x-1 transition-opacity duration-300 justify-self-center min-w-0">
             {links.map((l) => {
                 return <DropdownMenu link={l} />;
             })}
         </div>
-        <div class="flex items-center gap-1">
+        <div class="flex items-center gap-1 justify-self-end min-w-0">
             <div id="search-container">
                 <Search client:only="svelte"></Search>
             </div>
@@ -221,16 +221,6 @@ function initSemifullScrollDetection() {
     if (window.semifullScrollHandler) {
         // @ts-ignore
         window.removeEventListener('scroll', window.semifullScrollHandler);
-    }
-    
-    // 获取当前是否为首页
-    // @ts-ignore
-    const isHomePage = navbar.dataset.isHome === 'true';
-
-    // 如果不是首页，在平板/桌面端强制显示为scrolled状态
-    if (!isHomePage) {
-        navbar.classList.add('scrolled');
-        return;
     }
     
     let ticking = false;
