@@ -66,12 +66,14 @@ const kbDurationMs = carouselIntervalMs + fadeMs;
 
 const hasBannerCredit = siteConfig.banner.credit.enable;
 const hasBannerLink = !!siteConfig.banner.credit.url;
+const shouldShowBannerInitially =
+	siteConfig.wallpaperMode.defaultMode === "banner";
 ---
 
 <div
 	id="banner-wrapper"
 	class={`absolute z-10 w-full transition duration-700 overflow-hidden ${mobileNonHomeBannerClass}`}
-	style={`top: -${BANNER_HEIGHT_EXTEND}vh`}
+	style={`top: -${BANNER_HEIGHT_EXTEND}vh; display: ${shouldShowBannerInitially ? "block" : "none"}`}
 >
 	{isCarouselEnabled ? (
 		/* 轮播图模式：Ken Burns + Crossfade */
