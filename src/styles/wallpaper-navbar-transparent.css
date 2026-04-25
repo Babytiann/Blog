@@ -6,10 +6,12 @@
   --radius-std: 0.75rem;
 
   /* --- 状态变量 (默认值) --- */
-  --nav-bg: var(--card-bg);
-  --nav-blur: none;
+  --nav-bg: rgba(255, 255, 255, 0.8);
+  --nav-blur: blur(5px);
   --nav-shadow: var(--shadow-sm);
   --nav-radius: var(--radius-std);
+  --nav-offset: 0;
+  --nav-inset: 0px;
 
   /* --- 面板变量 (默认跟随 Navbar，特定情况分离) --- */
   --panel-bg: var(--card-bg-transparent);
@@ -20,15 +22,20 @@
 :root.dark {
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
   --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.18);
+  --nav-bg: rgba(24, 25, 38, 0.8);
 }
 
 /* --- 滚动透明度控制 (Dynamic Transparent) --- */
 
 /* Semi (毛玻璃) */
 #navbar[data-dynamic-transparent="semi"] {
-  --nav-bg: var(--card-bg-transparent);
+  --nav-bg: rgba(255, 255, 255, 0.8);
   --nav-blur: blur(8px);
   --nav-shadow: var(--shadow-lg);
+}
+
+:root.dark #navbar[data-dynamic-transparent="semi"] {
+  --nav-bg: rgba(24, 25, 38, 0.8);
 }
 
 /* None (实心) */
@@ -42,49 +49,86 @@
   --panel-blur: none;
 }
 
+:root.dark #navbar[data-dynamic-transparent="none"] {
+  --nav-bg: rgba(24, 25, 38, 0.8);
+}
+
 /* --- 首页 Banner 沉浸式 (Wallpaper Transparent) --- */
 
 /* 桌面端 Full 模式 */
 @media (min-width: 1280px) {
   body.wallpaper-transparent #navbar[data-transparent-mode="full"] {
-    --nav-bg: transparent;
-    --nav-blur: none;
-    --nav-shadow: none;
-    --nav-radius: 0;
+    --nav-bg: rgba(255, 255, 255, 0.8);
+    --nav-blur: blur(5px);
+    --nav-shadow: var(--shadow-sm);
+    --nav-radius: var(--radius-std);
+  }
+
+  :root.dark body.wallpaper-transparent #navbar[data-transparent-mode="full"] {
+    --nav-bg: rgba(24, 25, 38, 0.8);
   }
 }
 
 /* 移动端 Full 模式 (仅首页) */
 @media (max-width: 1279px) {
   body.wallpaper-transparent #navbar[data-transparent-mode="full"][data-is-home="true"] {
-    --nav-bg: transparent;
-    --nav-blur: none;
-    --nav-shadow: none;
-    --nav-radius: 0;
+    --nav-bg: rgba(255, 255, 255, 0.8);
+    --nav-blur: blur(5px);
+    --nav-shadow: var(--shadow-sm);
+    --nav-radius: var(--radius-std);
+  }
+
+  :root.dark body.wallpaper-transparent #navbar[data-transparent-mode="full"][data-is-home="true"] {
+    --nav-bg: rgba(24, 25, 38, 0.8);
   }
 }
 
 /* Semi-Full 混合模式 (未滚动时透明) */
 body.wallpaper-transparent #navbar[data-transparent-mode="semifull"]:not(.scrolled) {
-  --nav-bg: transparent;
-  --nav-blur: none;
-  --nav-shadow: none;
-  --nav-radius: 0;
+  --nav-bg: rgba(255, 255, 255, 0.8);
+  --nav-blur: blur(5px);
+  --nav-shadow: var(--shadow-sm);
+  --nav-radius: var(--radius-std);
+}
+
+:root.dark body.wallpaper-transparent #navbar[data-transparent-mode="semifull"]:not(.scrolled) {
+  --nav-bg: rgba(24, 25, 38, 0.8);
 }
 /* 移动端首页特殊处理 */
 body.wallpaper-transparent #navbar[data-transparent-mode="semifull"][data-is-home="true"]:not(.scrolled) {
-  --nav-bg: transparent;
-  --nav-blur: none;
-  --nav-shadow: none;
-  --nav-radius: 0;
+  --nav-bg: rgba(255, 255, 255, 0.8);
+  --nav-blur: blur(5px);
+  --nav-shadow: var(--shadow-sm);
+  --nav-radius: var(--radius-std);
+}
+
+:root.dark body.wallpaper-transparent #navbar[data-transparent-mode="semifull"][data-is-home="true"]:not(.scrolled) {
+  --nav-bg: rgba(24, 25, 38, 0.8);
 }
 
 /* 混合模式滚动后 -> 回归毛玻璃 */
 body.wallpaper-transparent #navbar[data-transparent-mode="semifull"].scrolled {
-  --nav-bg: var(--card-bg-transparent);
-  --nav-blur: blur(8px);
+  --nav-bg: rgba(255, 255, 255, 0.8);
+  --nav-blur: blur(5px);
   --nav-shadow: var(--shadow-lg);
-  --nav-radius: var(--radius-std);
+  --nav-radius: 72px;
+}
+
+:root.dark body.wallpaper-transparent #navbar[data-transparent-mode="semifull"].scrolled {
+  --nav-bg: rgba(24, 25, 38, 0.8);
+}
+
+#navbar.scrolled {
+  --nav-radius: 72px;
+  --nav-offset: 1rem;
+  --nav-inset: 2vw;
+  --nav-shadow: var(--shadow-lg);
+}
+
+#navbar-wrapper.navbar-hidden {
+  opacity: 1 !important;
+  translate: none !important;
+  transform: none !important;
 }
 
 /* 导航栏样式核心 (Navbar Core) */
@@ -93,14 +137,27 @@ body.wallpaper-transparent #navbar[data-transparent-mode="semifull"].scrolled {
   outline: none;
 
   /* 核心外观由变量驱动 */
-  background: var(--nav-bg);
-  backdrop-filter: var(--nav-blur);
-  box-shadow: var(--nav-shadow);
-  border-radius: var(--nav-radius);
+  background: var(--nav-bg) !important;
+  backdrop-filter: var(--nav-blur) !important;
+  -webkit-backdrop-filter: var(--nav-blur) !important;
+  box-shadow: var(--nav-shadow) !important;
+  border-radius: var(--nav-radius) !important;
+  width: calc(100% - var(--nav-inset) - var(--nav-inset)) !important;
+  max-width: none !important;
+  margin-left: var(--nav-inset) !important;
+  margin-right: var(--nav-inset) !important;
+  transform: translateY(var(--nav-offset));
 
   /* 性能优化 */
-  will-change: background, backdrop-filter, box-shadow;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: width, margin, background, backdrop-filter, box-shadow, border-radius, transform;
+  transition:
+    width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    margin 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    backdrop-filter 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-radius 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* 子组件样式 (Sub-Components)
